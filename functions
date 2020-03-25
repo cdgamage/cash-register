@@ -1,0 +1,73 @@
+function checkCashRegister(price, cash, cid) {
+  let totalChangeDue = cash - price;
+  let output = { status: null, change: [] };
+  let totalCid = 0;
+  const currencyVal = [
+    {currency: "PENNY", value: 0.01}, 
+    {currency: "NICKEL", value: 0.05}, 
+    {currency: "DIME", value: 0.10}, 
+    {currency: "QUARTER", value: 0.25}, 
+    {currency: "ONE", value:  1.00}, 
+    {currency: "FIVE", value: 5.00}, 
+    {currency: "TEN", value: 10.00}, 
+    {currency: "TWENTY", value: 20.00}, 
+    {currency: "ONE HUNDRED", value: 100.00}
+  ];
+
+  //calculate the total cash in the register drawer
+  for (let i = cid.length-1; i >= 0; i--) {
+      totalCid += cid[i][1];
+  }
+
+  console.log("Total Cash In Drawer:", totalCid);
+  console.log("Total Change Due:", totalChangeDue);
+
+  //check if the register has enough funds available and then if the change due exactly matches the available funds
+  if (totalCid < totalChangeDue) {
+    output.status = "INSUFFICIENT_FUNDS";
+    return output;
+  } else if (totalCid === totalChangeDue) {
+    output.status = "CLOSED";
+    output.change = cid;
+    return output;
+  } 
+
+  let changeInCurrency = [];//an array to hold the change to be dispensed in the specific bills/coins
+  let changeDue = 0;//
+
+  //loop through currency values in descending order
+  for (let j = currencyVal.length-1; j >= 0; j--) {
+    
+    //find the largest available bills and coins, based on their value and availability, which can be deducted from the total change due 
+    while ((currencyVal[j].value <= totalChangeDue) && (changeDue < cid[j][1])) {
+      changeDue += currencyVal[j].value;
+      totalChangeDue -= currencyVal[j].value;
+      changeDue = Math.round(changeDue * 100) / 100;
+      totalChangeDue = Math.round(totalChangeDue * 100)/100;
+    }
+    
+    //store the bill or coin and the corresponding amount to be dispensed
+    if (changeDue > 0) {
+      changeInCurrency.push([currencyVal[j].currency, changeDue]);
+    }
+
+    changeDue = 0;
+  
+  }
+
+  console.log("Change Due In Currency:", changeInCurrency);
+  
+  //if exact change is not available then notify cashier of insufficient funds
+  if ( totalChangeDue > 0 ) {
+    output.status = "INSUFFICIENT_FUNDS";
+    output.change = [];
+    return output;
+  }
+  
+  //if exact change is available return the change due in in each bill and coin
+  output.status = "OPEN";
+  output.change = changeInCurrency;
+  return output;
+}
+
+checkCashRegister(3.26, 100, [["PENNY", 1.01], ["NICKEL", 2.05], ["DIME", 3.1], ["QUARTER", 4.25], ["ONE", 90], ["FIVE", 55], ["TEN", 20], ["TWENTY", 60], ["ONE HUNDRED", 100]]);

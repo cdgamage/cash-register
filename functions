@@ -64,7 +64,7 @@ function checkCashRegister(price, cash, cid) {
     return output;
   }
   
-  //if exact change is available return the change due in in each bill and coin
+  //if exact change is available return the bills and coins to be dispensed and the amounts of each
   output.status = "OPEN";
   output.change = changeInCurrency;
   return output;
